@@ -5,6 +5,7 @@ import (
   "database/sql"
   "net/http"
   "strconv"
+  "github.com/rcrowley/go-metrics"
 )
 
 type HandleFunc func(*sql.DB, *http.Request) interface{}
@@ -17,6 +18,17 @@ type Handler struct {
 type Error struct {
   Status  int
   Message string
+}
+
+type TimeHandler struct {
+  Timer   metrics.Timer
+  Handler http.Handler
+}
+
+func (th TimeHandler) ServeHTTP(writer http.ResponseWriter, r *http.Request) {
+  th.Timer.Time(func() {
+    th.Handler.ServeHTTP(writer, r)
+  })
 }
 
 func (appHandler Handler) ServeHTTP(writer http.ResponseWriter, r *http.Request) {
