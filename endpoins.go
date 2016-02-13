@@ -1,38 +1,18 @@
-package main // import "github.com/mopsalarm/pr0gramm-meta-rest"
+package main
 
 import (
-  "os"
   "fmt"
-  "log"
   "time"
   "strings"
   "regexp"
   "sync"
 
-  "github.com/bobziuchkovski/writ"
-
   "net/http"
-  "github.com/gorilla/mux"
-  "github.com/gorilla/handlers"
-
   "database/sql"
   _ "github.com/lib/pq"
 
-  "github.com/rcrowley/go-metrics"
-  "github.com/vistarmedia/go-datadog"
-
   "github.com/mopsalarm/pr0gramm-meta-rest/app"
 )
-
-const SAMPLE_PERIOD = time.Minute
-
-type Args struct {
-  HelpFlag  bool   `flag:"help" description:"Display this help message and exit"`
-  Verbosity int    `flag:"v, verbose" description:"Display verbose output"`
-  Port      int    `option:"p, port" default:"8080" description:"The port to open the rest service on"`
-  Postgres  string `option:"postgres" default:"host=localhost user=postgres password=password sslmode=disable" description:"Postgres DSN for database connection"`
-  Datadog   string `option:"datadog" description:"Datadog api key for reporting"`
-}
 
 func queryOrPanic(db *sql.DB, query string, args ...interface{}) *sql.Rows {
   rows, err := db.Query(query, args...)
@@ -95,8 +75,7 @@ func queryPreviews(db *sql.DB, itemIds string) []PreviewInfo {
   return infos
 }
 
-func handleUser(db *sql.DB, req *http.Request) interface{} {
-  vars := mux.Vars(req)
+func handleUser(db *sql.DB, vars map[string]string, req *http.Request) interface{} {
   minTimestamp := time.Now().Add(-7 * 24 * time.Hour).Unix()
 
   rows := queryOrPanic(db, `SELECT user_score.timestamp, user_score.score
@@ -118,9 +97,7 @@ func handleUser(db *sql.DB, req *http.Request) interface{} {
   return result
 }
 
-func handleUserSuggest(db *sql.DB, req *http.Request) interface{} {
-  vars := mux.Vars(req)
-
+func handleUserSuggest(db *sql.DB, vars map[string]string, req *http.Request) interface{} {
   prefix := strings.Replace(vars["prefix"], "%", "", 0) + "%"
   if len(prefix) < 3 {
     return app.Error{http.StatusPreconditionFailed, "Need at least 3 characters"}
@@ -143,7 +120,7 @@ func handleUserSuggest(db *sql.DB, req *http.Request) interface{} {
   return UserSuggestResponse{names}
 }
 
-func handleItems(db *sql.DB, req *http.Request) interface{} {
+func handleItems(db *sql.DB, vars map[string]string, req *http.Request) interface{} {
   startTime := time.Now()
 
   // validate input
@@ -180,61 +157,3 @@ func handleItems(db *sql.DB, req *http.Request) interface{} {
   return response
 }
 
-type Route struct {
-  name    string
-  url     string
-  handler app.HandleFunc
-}
-
-func main() {
-  var err error
-  args := &Args{}
-  cmd := writ.New("webapp", args)
-
-  // Use cmd.Decode(os.Args[1:]) in a real application
-  _, _, err = cmd.Decode(os.Args[1:])
-  if err != nil || args.HelpFlag {
-    cmd.ExitHelp(err)
-  }
-
-  // open database connection
-  db, err := sql.Open("postgres", args.Postgres)
-  db.SetMaxOpenConns(4)
-  if err != nil {
-    log.Fatal(err)
-  }
-
-  // check if it is valid
-  if err = db.Ping(); err != nil {
-    log.Fatal(err)
-  }
-
-  // get info about the runtime every few seconds
-  metrics.RegisterRuntimeMemStats(metrics.DefaultRegistry)
-  go metrics.CaptureRuntimeMemStats(metrics.DefaultRegistry, SAMPLE_PERIOD)
-
-  if len(args.Datadog) > 0 {
-    host, _ := os.Hostname()
-
-    fmt.Printf("Starting datadog reporter on host %s\n", host)
-    go datadog.New(host, args.Datadog).DefaultReporter().Start(SAMPLE_PERIOD)
-  }
-
-  router := mux.NewRouter().StrictSlash(true)
-
-  routes := []Route{
-    Route{"items", "/items", handleItems},
-    Route{"user", "/user/{user}", handleUser},
-    Route{"user-suggest", "/user/suggest/{prefix}", handleUserSuggest},
-  }
-
-  for _, route := range routes {
-    timer := metrics.NewRegisteredTimer("pr0gramm.meta.webapp.request." + route.name, nil)
-    router.Handle(route.url, app.TimeHandler{timer, app.Handler{db, route.handler}})
-  }
-
-  log.Fatal(http.ListenAndServe(fmt.Sprintf(":%d", args.Port),
-    handlers.RecoveryHandler()(
-      handlers.LoggingHandler(os.Stdout,
-        handlers.CORS()(router)))))
-}

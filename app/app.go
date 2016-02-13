@@ -6,9 +6,10 @@ import (
   "net/http"
   "strconv"
   "github.com/rcrowley/go-metrics"
+  "github.com/gorilla/mux"
 )
 
-type HandleFunc func(*sql.DB, *http.Request) interface{}
+type HandleFunc func(*sql.DB, map[string]string, *http.Request) interface{}
 
 type Handler struct {
   Database   *sql.DB
@@ -32,7 +33,9 @@ func (th TimeHandler) ServeHTTP(writer http.ResponseWriter, r *http.Request) {
 }
 
 func (appHandler Handler) ServeHTTP(writer http.ResponseWriter, r *http.Request) {
-  result := appHandler.HandleFunc(appHandler.Database, r)
+  vars := mux.Vars(r)
+  result := appHandler.HandleFunc(appHandler.Database, vars, r)
+
   switch val := result.(type) {
   case Error:
     writer.WriteHeader(val.Status)
