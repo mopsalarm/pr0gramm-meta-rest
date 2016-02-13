@@ -6,6 +6,8 @@ import (
   "log"
   "time"
   "strings"
+  "regexp"
+  "sync"
 
   "github.com/bobziuchkovski/writ"
 
@@ -16,10 +18,9 @@ import (
   "database/sql"
   _ "github.com/lib/pq"
 
-  "regexp"
-  "sync"
   "github.com/rcrowley/go-metrics"
   "github.com/vistarmedia/go-datadog"
+  
   "github.com/mopsalarm/pr0gramm-meta-rest/app"
 )
 
