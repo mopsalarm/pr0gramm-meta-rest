@@ -28,6 +28,8 @@ func queryReposts(db *sql.DB, itemIds string) []int64 {
     WHERE item_id IN (%s) AND +confidence>0.3 AND lower(tag)='repost'
     LIMIT 150`, itemIds))
 
+  defer rows.Close()
+
   result := make([]int64, 0, 100)
   for rows.Next() {
     var itemId int64
@@ -43,6 +45,7 @@ func queryReposts(db *sql.DB, itemIds string) []int64 {
 
 func querySizes(db *sql.DB, itemIds string) []SizeInfo {
   rows := queryOrPanic(db, fmt.Sprintf("SELECT id, width, height FROM sizes WHERE id IN (%s) LIMIT 150", itemIds))
+  defer rows.Close()
 
   sizeInfos := make([]SizeInfo, 0, 100)
   for rows.Next() {
@@ -61,6 +64,8 @@ func queryPreviews(db *sql.DB, itemIds string) []PreviewInfo {
   rows := queryOrPanic(db,
     "SELECT id, width, height, encode(preview, 'base64') FROM item_previews WHERE id IN (%s) LIMIT 150",
     itemIds)
+
+  defer rows.Close()
 
   infos := make([]PreviewInfo, 0, 100)
   for rows.Next() {
@@ -82,6 +87,8 @@ func handleUser(db *sql.DB, vars map[string]string, req *http.Request) interface
     FROM user_score, users
     WHERE lower(users.name)=lower($1) AND users.id=user_score.user_id AND user_score.timestamp>$2`,
     vars["user"], minTimestamp)
+
+  defer rows.Close()
 
   result := UserResponse{}
 
@@ -106,6 +113,8 @@ func handleUserSuggest(db *sql.DB, vars map[string]string, req *http.Request) in
   rows := queryOrPanic(db,
     "SELECT name FROM users WHERE lower(name) LIKE lower($1) ORDER BY score DESC LIMIT 20",
     prefix)
+
+  defer rows.Close()
 
   var names []string
   for rows.Next() {

@@ -25,7 +25,6 @@ const SAMPLE_PERIOD = time.Minute
 
 type Args struct {
   HelpFlag  bool   `flag:"help" description:"Display this help message and exit"`
-  Verbosity int    `flag:"v, verbose" description:"Display verbose output"`
   Port      int    `option:"p, port" default:"8080" description:"The port to open the rest service on"`
   Postgres  string `option:"postgres" default:"host=localhost user=postgres password=password sslmode=disable" description:"Postgres DSN for database connection"`
   Datadog   string `option:"datadog" description:"Datadog api key for reporting"`
@@ -50,10 +49,11 @@ func main() {
 
   // open database connection
   db, err := sql.Open("postgres", args.Postgres)
-  db.SetMaxOpenConns(4)
   if err != nil {
     log.Fatal(err)
   }
+
+  db.SetMaxOpenConns(4)
 
   // check if it is valid
   if err = db.Ping(); err != nil {
