@@ -1,0 +1,24 @@
+hash: a95992e0a6aceb0c78572a2f0270cebd5ddf53a2efd85c78273e99d0ac8db4c1
+updated: 2016-02-14T21:33:27.116326977+01:00
+imports:
+- name: github.com/bobziuchkovski/writ
+  version: 08e3f25d8bc677e6dcf7b157614c712622556019
+- name: github.com/gorilla/context
+  version: 1c83b3eabd45b6d76072b66b746c20815fb2872d
+- name: github.com/gorilla/handlers
+  version: b3aff83722cb2ae031a70cae984650e3a16cd20e
+- name: github.com/gorilla/mux
+  version: 26a6070f849969ba72b72256e9f14cf519751690
+- name: github.com/lib/pq
+  version: 69552e54d2a9d4c6a2438926a774930f7bc398ec
+  subpackages:
+  - oid
+- name: github.com/mopsalarm/pr0gramm-meta-rest
+  version: 8d14ee309ef851ed410ba8d40860bd1bf35cc401
+  subpackages:
+  - app
+- name: github.com/rcrowley/go-metrics
+  version: 51425a2415d21afadfd55cd93432c0bc69e9598d
+- name: github.com/vistarmedia/go-datadog
+  version: d05578420bfaf173df31fc00580f57b904df6222
+devImports: []

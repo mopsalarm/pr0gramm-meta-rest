@@ -1,2 +1,5 @@
 /pr0gramm-meta-rest
+/vendor
+
+/.idea
 *.iml
