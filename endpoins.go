@@ -62,8 +62,7 @@ func querySizes(db *sql.DB, itemIds string) []SizeInfo {
 
 func queryPreviews(db *sql.DB, itemIds string) []PreviewInfo {
   rows := queryOrPanic(db,
-    "SELECT id, width, height, encode(preview, 'base64') FROM item_previews WHERE id IN (%s) LIMIT 150",
-    itemIds)
+    fmt.Sprintf("SELECT id, width, height, encode(preview, 'base64') FROM item_previews WHERE id IN (%s) LIMIT 150", itemIds))
 
   defer rows.Close()
 
@@ -165,4 +164,3 @@ func handleItems(db *sql.DB, vars map[string]string, req *http.Request) interfac
   response.Duration = time.Since(startTime).Seconds()
   return response
 }
-
