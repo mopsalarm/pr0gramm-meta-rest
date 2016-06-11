@@ -53,7 +53,10 @@ func main() {
 		log.Fatal(err)
 	}
 
-	db.SetMaxOpenConns(4)
+	defer db.Close()
+	db.SetMaxOpenConns(2)
+	db.SetMaxIdleConns(1)
+	db.SetConnMaxLifetime(5*time.Minute)
 
 	// check if it is valid
 	if err = db.Ping(); err != nil {
