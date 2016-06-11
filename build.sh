@@ -1,12 +1,11 @@
 #!/bin/sh
 set -e
+#!/bin/sh
+set -e
 
-docker run --rm \
-  -v "$(pwd):/src" \
-  -v /var/run/docker.sock:/var/run/docker.sock \
-  centurylink/golang-builder \
-  mopsalarm/pr0gramm-meta-rest
+glide install
 
-# go build
-# docker build -t mopsalarm/pr0gramm-meta-rest .
+CGO_ENABLED=0 go build -a
+
+docker build -t mopsalarm/pr0gramm-meta-rest .
 docker push mopsalarm/pr0gramm-meta-rest

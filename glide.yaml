@@ -1,11 +1,8 @@
-package: .
+package: github.com/mopsalarm/pr0gramm-meta-rest
 import:
 - package: github.com/bobziuchkovski/writ
 - package: github.com/gorilla/handlers
 - package: github.com/gorilla/mux
 - package: github.com/lib/pq
-- package: github.com/mopsalarm/pr0gramm-meta-rest
-  subpackages:
-  - app
 - package: github.com/rcrowley/go-metrics
 - package: github.com/vistarmedia/go-datadog

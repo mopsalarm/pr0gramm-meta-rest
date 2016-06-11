@@ -1,24 +1,20 @@
-hash: a95992e0a6aceb0c78572a2f0270cebd5ddf53a2efd85c78273e99d0ac8db4c1
-updated: 2016-02-14T21:33:27.116326977+01:00
+hash: 98aa73a925b922addbfd1c7b89a9a9d2f8f773c8453ca077b568597e3812a121
+updated: 2016-06-11T21:49:46.366243+02:00
 imports:
 - name: github.com/bobziuchkovski/writ
   version: 08e3f25d8bc677e6dcf7b157614c712622556019
 - name: github.com/gorilla/context
-  version: 1c83b3eabd45b6d76072b66b746c20815fb2872d
+  version: aed02d124ae4a0e94fea4541c8effd05bf0c8296
 - name: github.com/gorilla/handlers
-  version: b3aff83722cb2ae031a70cae984650e3a16cd20e
+  version: 66e6c6f01d8da976ee113437745ca029c2b585a6
 - name: github.com/gorilla/mux
-  version: 26a6070f849969ba72b72256e9f14cf519751690
+  version: 9fa818a44c2bf1396a17f9d5a3c0f6dd39d2ff8e
 - name: github.com/lib/pq
-  version: 69552e54d2a9d4c6a2438926a774930f7bc398ec
+  version: ee1442bda7bd1b6a84e913bdb421cb1874ec629d
   subpackages:
   - oid
-- name: github.com/mopsalarm/pr0gramm-meta-rest
-  version: 8d14ee309ef851ed410ba8d40860bd1bf35cc401
-  subpackages:
-  - app
 - name: github.com/rcrowley/go-metrics
-  version: 51425a2415d21afadfd55cd93432c0bc69e9598d
+  version: eeba7bd0dd01ace6e690fa833b3f22aaec29af43
 - name: github.com/vistarmedia/go-datadog
   version: d05578420bfaf173df31fc00580f57b904df6222
 devImports: []
