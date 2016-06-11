@@ -1,7 +1,5 @@
 #!/bin/sh
 set -e
-#!/bin/sh
-set -e
 
 glide install
 
